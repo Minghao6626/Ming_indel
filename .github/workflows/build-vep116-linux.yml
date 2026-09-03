@@ -48,26 +48,27 @@ jobs:
             > "$GITHUB_WORKSPACE/build_metadata/vep116.1_explicit_linux-64.txt"
 
           /opt/micromamba-bin/micromamba run -p "$env_prefix" \
-          perl -MFindBin -e 'print "$FindBin::Bin\n"' \
-          > "$GITHUB_WORKSPACE/build_metadata/perl_findbin_check.txt"
-
+            perl -MFindBin -e 'print "$FindBin::Bin\n"' \
+            > "$GITHUB_WORKSPACE/build_metadata/perl_findbin_check.txt"
           /opt/micromamba-bin/micromamba run -p "$env_prefix" \
-          vep --help \
-          > "$GITHUB_WORKSPACE/build_metadata/vep_help.txt"
-
+            vep --help \
+            > "$GITHUB_WORKSPACE/build_metadata/vep_help.txt"
           /opt/micromamba-bin/micromamba run -p "$env_prefix" \
-          perl -v \
-          > "$GITHUB_WORKSPACE/build_metadata/perl_version.txt"
-     - name: Pack and checksum environment
-           shell: bash
-       run: |
+            perl -v \
+            > "$GITHUB_WORKSPACE/build_metadata/perl_version.txt"
+          grep -E '^ensembl-vep[[:space:]]+116\.1([[:space:]]|$)' \
+            "$GITHUB_WORKSPACE/build_metadata/vep116.1_package_list.txt"
+
+      - name: Pack and checksum environment
+        shell: bash
+        run: |
           set -euo pipefail
           export MAMBA_ROOT_PREFIX="$GITHUB_WORKSPACE/.mamba"
           env_prefix="$GITHUB_WORKSPACE/vep116_env"
           artifact_dir="$GITHUB_WORKSPACE/artifact"
           mkdir -p "$artifact_dir"
 
-            /opt/micromamba-bin/micromamba run -p "$env_prefix" \
+          /opt/micromamba-bin/micromamba run -p "$env_prefix" \
             conda-pack -p "$env_prefix" \
             -o "$artifact_dir/vep116.1_linux-x86_64_glibc2.31.tar.gz"
 
@@ -86,4 +87,3 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 30
-
