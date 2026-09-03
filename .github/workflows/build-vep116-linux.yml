@@ -58,7 +58,6 @@ jobs:
           /opt/micromamba-bin/micromamba run -p "$env_prefix" \
           perl -v \
           > "$GITHUB_WORKSPACE/build_metadata/perl_version.txt"
-
      - name: Pack and checksum environment
            shell: bash
        run: |
