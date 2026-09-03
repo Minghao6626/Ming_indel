@@ -40,23 +40,28 @@ jobs:
           /opt/micromamba-bin/micromamba create -y -p "$env_prefix" \
             --strict-channel-priority \
             -c conda-forge -c bioconda \
-            'ensembl-vep=116.1' conda-pack
+            'ensembl-vep=116.1' 'perl-findbin=1.54' conda-pack
 
           /opt/micromamba-bin/micromamba list -p "$env_prefix" \
             > "$GITHUB_WORKSPACE/build_metadata/vep116.1_package_list.txt"
           /opt/micromamba-bin/micromamba list -p "$env_prefix" --explicit \
             > "$GITHUB_WORKSPACE/build_metadata/vep116.1_explicit_linux-64.txt"
 
-          "$env_prefix/bin/vep" --help \
-            > "$GITHUB_WORKSPACE/build_metadata/vep_help.txt"
-          "$env_prefix/bin/perl" -v \
-            > "$GITHUB_WORKSPACE/build_metadata/perl_version.txt"
-          grep -E '^ensembl-vep[[:space:]]+116\.1([[:space:]]|$)' \
-            "$GITHUB_WORKSPACE/build_metadata/vep116.1_package_list.txt"
+          /opt/micromamba-bin/micromamba run -p "$env_prefix" \
+          perl -MFindBin -e 'print "$FindBin::Bin\n"' \
+          > "$GITHUB_WORKSPACE/build_metadata/perl_findbin_check.txt"
 
-      - name: Pack and checksum environment
-        shell: bash
-        run: |
+          /opt/micromamba-bin/micromamba run -p "$env_prefix" \
+          vep --help \
+          > "$GITHUB_WORKSPACE/build_metadata/vep_help.txt"
+
+          /opt/micromamba-bin/micromamba run -p "$env_prefix" \
+          perl -v \
+          > "$GITHUB_WORKSPACE/build_metadata/perl_version.txt"
+
+     - name: Pack and checksum environment
+           shell: bash
+       run: |
           set -euo pipefail
           export MAMBA_ROOT_PREFIX="$GITHUB_WORKSPACE/.mamba"
           env_prefix="$GITHUB_WORKSPACE/vep116_env"
